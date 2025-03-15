@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Captain Order Page</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #e74c3c;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 24px;
+        }
+
+        .container {
+            margin: 20px auto;
+            max-width: 900px;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        select {
+            padding: 5px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        button {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #f57c00;
+        }
+        
+        #logout-btn {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background-color: #cdc5c4;
+        color: rgb(195, 29, 29);
+        border: none;
+        padding: 10px 20px;
+        font-size: 14px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    #logout-btn:hover {
+        background-color: #f1f1f1;
+    }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Captain - Manage Orders</h1>
+    <button id="logout-btn" onclick="logout()">Logout</button>
+</header>
+
+<div class="container">
+    <h2>Orders List</h2>
+    <table id="orders-table">
+        <thead>
+        <tr>
+            <th>Order ID</th>
+            <th>User</th>
+            <th>Total Price</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Orders will be dynamically inserted here -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // Get the token from localStorage
+    const token = localStorage.getItem('token');
+
+    // Check if token exists
+    if (!token) {
+        alert('You must be logged in to access this page.');
+        window.location.href = '/login.html'; // Redirect to login page
+    }
+
+    // Fetch all orders for the captain
+    async function fetchOrders() {
+        try {
+            const response = await fetch('http://127.0.0.1:8000/api/index_order', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}` // Include token in the headers
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.status === 'success') {
+                    displayOrders(data.data);
+                } else {
+                    alert('Failed to fetch orders');
+                }
+            } else {
+                alert('Failed to fetch orders');
+            }
+        } catch (error) {
+            console.error('Error fetching orders:', error);
+        }
+    }
+
+    // Display orders in the table
+    function displayOrders(orders) {
+        const tableBody = document.querySelector('#orders-table tbody');
+        tableBody.innerHTML = ''; // Clear existing rows
+
+        orders.forEach(order => {
+            const row = document.createElement('tr');
+
+            row.innerHTML = `
+                <td>${order.id}</td>
+                <td>${order.user.name}</td>
+                <td>${order.total_price}</td>
+                <td>
+                    <select id="status-${order.id}">
+                        <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>Pending</option>
+                        <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>Delivered</option>
+                        <option value="cancelled" ${order.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+                    </select>
+                </td>
+                <td>
+                    <button onclick="handleUpdateButton(${order.id})">Update</button>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    // Handle the update button click
+    function handleUpdateButton(orderId) {
+        const status = document.querySelector(`#status-${orderId}`).value; // Get selected status
+        updateOrderStatus(orderId, status);
+    }
+
+    // Update the order status using API
+    async function updateOrderStatus(orderId, status) {
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/api/update_order/${orderId}`, {
+                method: 'POST', // As per your Postman request
+                headers: {
+                    'Authorization': `Bearer ${token}`, // Include token in the headers
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status }) // Send status in the request body
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert('Order status updated successfully');
+                fetchOrders(); // Refresh orders after update
+            } else {
+                console.error('Response Error:', data);
+                alert('Failed to update order status: ' + (data.message || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Error updating order status:', error);
+            alert('An error occurred while updating the order.');
+        }
+    }
+
+    // Fetch orders when the page loads
+    fetchOrders();
+
+
+    
+    async function logout() {
+        const token = localStorage.getItem('token');
+        try {
+            const response = await fetch('http://127.0.0.1:8000/api/logout', {
+                method: 'GET', 
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                alert('Logout successful.');
+                localStorage.removeItem('token');
+                window.location.href = 'login.html';
+            } else {
+                const data = await response.json();
+                alert('Logout failed: ' + (data.message || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Logout error:', error);
+            alert('Error during logout. Please try again.');
+        }
+    }
+</script>
+
+</body>
+</html>

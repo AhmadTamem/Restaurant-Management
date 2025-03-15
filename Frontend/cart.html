@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cart</title>
+  <style>
+    /* General Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f8f8f8;
+      color: #333;
+    }
+
+    header {
+      background-color: #e74c3c; /* Red color for the restaurant theme */
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 28px;
+      border-bottom: 3px solid #c0392b;
+    }
+
+    .container {
+      margin: 30px auto;
+      max-width: 900px;
+      background: white;
+      border-radius: 8px;
+      padding: 25px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      font-size: 24px;
+      color: #e74c3c;
+      margin-bottom: 20px;
+    }
+
+    .item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .item:last-child {
+      border-bottom: none;
+    }
+
+    button {
+      background-color: #e74c3c; /* Red color */
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #c0392b;
+    }
+
+    .total {
+      font-size: 18px;
+      text-align: right;
+      margin-top: 20px;
+    }
+
+    #submit-order {
+      display: block;
+      margin: 20px auto;
+      background-color: #c0392b;
+      padding: 10px 15px;
+      font-size: 16px;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    #submit-order:hover {
+      background-color:  #c0392b;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 22px;
+      }
+
+      .item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      button {
+        width: 100%;
+        font-size: 14px;
+        padding: 12px;
+      }
+    }
+    @media (max-width: 480px) {
+      header h1 {
+        font-size: 22px;
+      }
+
+      .container {
+        width: 90%;
+      }
+
+      button {
+        font-size: 14px;
+        padding: 10px;
+      }
+
+
+    }
+    
+    #logout-btn {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background-color: #cdc5c4;
+        color: rgb(195, 29, 29);
+        border: none;
+        padding: 10px 20px;
+        font-size: 14px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    #logout-btn:hover {
+        background-color: #f1f1f1;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Your Cart</h1>
+    <button id="logout-btn" onclick="logout()">Logout</button>
+  </header>
+
+  <div class="container">
+    <div id="cart-list">
+      <!-- سيتم إدراج عناصر السلة هنا بواسطة JavaScript -->
+    </div>
+    <div class="total" id="total-price">Total: $0</div>
+    <button id="submit-order">Submit Order</button>
+  </div>
+
+  <script>
+    const API_BASE_URL = 'http://127.0.0.1:8000/api';
+    const token = localStorage.getItem('token'); // الحصول على التوكن
+
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+    // Display cart items
+    function displayCart() {
+      const cartList = document.getElementById('cart-list');
+      const totalPriceElement = document.getElementById('total-price');
+      cartList.innerHTML = '';
+      let total = 0;
+
+      cart.forEach((item, index) => {
+        total += item.price * item.quantity;
+
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'item';
+        itemDiv.innerHTML = `
+          <span>${item.name} - $${item.price} x ${item.quantity}</span>
+          <button onclick="removeFromCart(${index})">Remove</button>
+        `;
+        cartList.appendChild(itemDiv);
+      });
+
+      totalPriceElement.textContent = `Total: $${total}`;
+    }
+
+    // Remove item from cart
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      displayCart();
+    }
+
+    // Submit order
+    async function submitOrder() {
+      if (!token) {
+        alert('You need to log in to submit your order.');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const orderItems = cart.map(item => ({
+        menu_id: item.menu_id,
+        quantity: item.quantity,
+      }));
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/store_order`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ order_items: orderItems }),
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          alert('Order submitted successfully!');
+          localStorage.removeItem('cart');
+          cart = [];
+          displayCart();
+        } else {
+          if (data.message === 'This action is unauthorized.') {
+            alert('Your session has expired. Please log in again.');
+            window.location.href = 'login.html';
+          } else {
+            alert('Failed to submit order: ' + data.message);
+          }
+        }
+      } catch (error) {
+        console.error('Error submitting order:', error);
+      }
+    }
+
+    document.getElementById('submit-order').addEventListener('click', submitOrder);
+
+    // Display cart on page load
+    displayCart();
+
+
+    
+    async function logout() {
+        const token = localStorage.getItem('token');
+        try {
+            const response = await fetch('http://127.0.0.1:8000/api/logout', {
+                method: 'GET', 
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                alert('Logout successful.');
+                localStorage.removeItem('token');
+                window.location.href = 'login.html';
+            } else {
+                const data = await response.json();
+                alert('Logout failed: ' + (data.message || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Logout error:', error);
+            alert('Error during logout. Please try again.');
+        }
+    }
+  </script>
+</body>
+</html>

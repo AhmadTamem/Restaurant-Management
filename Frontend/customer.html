@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Items</title>
+  <style>
+    /* General Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f8f8f8;
+      color: #333;
+      line-height: 1.6; /* Better readability */
+    }
+
+    header {
+      background-color: #e74c3c;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 28px;
+      border-bottom: 3px solid #c0392b;
+      margin-bottom: 20px; /* Add margin below header */
+      text-transform: uppercase; /* Transform header text to uppercase */
+    }
+
+    .container {
+      margin: 30px auto;
+      max-width: 900px;
+      background: white;
+      border-radius: 8px;
+      padding: 25px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      font-size: 24px;
+      color: #e74c3c;
+      margin-bottom: 20px;
+      text-align: center; /* Center align headings */
+      text-transform: uppercase; /* Transform heading text to uppercase */
+    }
+
+    .item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding: 15px;
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .item:last-child {
+      margin-bottom: 0;
+    }
+
+    .item img {
+      border-radius: 5px;
+      margin-right: 15px;
+    }
+
+    .item-info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      margin-right: auto;
+      padding-left: 10px;
+    }
+
+    .item-name {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #333;
+    }
+
+    .item-price {
+      font-size: 16px;
+      color: #555;
+    }
+
+    button.add-to-cart {
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+
+    button.add-to-cart:hover {
+      background-color: #c0392b;
+    }
+
+    button.add-to-cart:active {
+      transform: scale(0.98);
+    }
+
+    .cart-link {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      font-size: 18px;
+      text-decoration: none;
+      color: #e74c3c;
+    }
+
+    .cart-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px;
+      }
+
+      h2 {
+        font-size: 22px;
+      }
+
+      .item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .item img {
+        width: 80px;
+        height: auto;
+        margin-bottom: 10px;
+      }
+
+      button.add-to-cart {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      header h1 {
+        font-size: 22px;
+      }
+
+      .container {
+        width: 90%;
+      }
+
+      button {
+        font-size: 14px;
+        padding: 10px;
+      }
+
+    }
+      #logout-btn {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background-color: #cdc5c4;
+        color: rgb(195, 29, 29);
+        border: none;
+        padding: 10px 20px;
+        font-size: 14px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    #logout-btn:hover {
+        background-color: #f1f1f1;
+    }
+    
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Customer Dashboard</h1>
+    <button id="logout-btn" onclick="logout()">Logout</button>
+  </header>
+
+  <div class="container">
+    <h2>Items</h2>
+    <div id="items-list">
+      <!-- سيتم إدراج العناصر هنا بواسطة JavaScript -->
+    </div>
+    <a href="cart.html" class="cart-link">Go to Cart</a>
+  </div>
+
+  <script>
+    const API_BASE_URL = 'http://127.0.0.1:8000/api/index';
+    const token = localStorage.getItem('token'); // إذا كان المستخدم مسجلاً دخوله
+
+    // Fetch items from API
+    async function fetchItems() {
+      try {
+        const response = await fetch(API_BASE_URL, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        const data = await response.json();
+
+        if (data.status === 'success') {
+          displayItems(data.data);
+        } else {
+          alert('Failed to fetch items');
+        }
+      } catch (error) {
+        console.error('Error fetching items:', error);
+      }
+    }
+
+    // Display items in the page
+    function displayItems(items) {
+      const itemsList = document.getElementById('items-list');
+      itemsList.innerHTML = '';
+
+      items.forEach(item => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'item';
+
+        // Check if the item has images
+        let imagesHtml = '';
+        if (item.image.length > 0) {
+          imagesHtml = `<img src="${item.image[0].image}" alt="${item.name}" width="100" height="100">`;
+        } else {
+          imagesHtml = '<p>No image available</p>';
+        }
+
+        itemDiv.innerHTML = `
+          ${imagesHtml}
+          <div class="item-info">
+            <div class="item-name">${item.name}</div>
+            <div class="item-price">$${item.price}</div>
+          </div>
+          <button class="add-to-cart" onclick="addToCart(${item.id}, '${item.name}', ${item.price})">Add to Cart</button>
+        `;
+        itemsList.appendChild(itemDiv);
+      });
+    }
+
+    // Add item to cart
+    function addToCart(menu_id, name, price) {
+      if (!token) {
+        alert('You need to log in to add items to your cart.');
+        window.location.href = 'login.html'; // توجيه المستخدم إلى صفحة تسجيل الدخول
+        return;
+      }
+
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const existingItem = cart.find(item => item.menu_id === menu_id);
+
+      if (existingItem) {
+        existingItem.quantity += 1;
+      } else {
+        cart.push({ menu_id, name, price, quantity: 1 });
+      }
+
+      localStorage.setItem('cart', JSON.stringify(cart));
+      alert('Item added to cart!');
+    }
+
+    // Fetch items on page load
+    fetchItems();
+
+
+    
+    async function logout() {
+        const token = localStorage.getItem('token');
+        try {
+            const response = await fetch('http://127.0.0.1:8000/api/logout', {
+                method: 'GET', 
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                alert('Logout successful.');
+                localStorage.removeItem('token');
+                window.location.href = 'login.html';
+            } else {
+                const data = await response.json();
+                alert('Logout failed: ' + (data.message || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Logout error:', error);
+            alert('Error during logout. Please try again.');
+        }
+    }
+  </script>
+</body>
+</html>

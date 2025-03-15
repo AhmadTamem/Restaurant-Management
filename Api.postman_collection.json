@@ -1,0 +1,782 @@
+{
+	"info": {
+		"_postman_id": "5aa0cd40-4960-481f-a1c9-b4f4259a7d54",
+		"name": "wbe",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "31874465"
+	},
+	"item": [
+		{
+			"name": "Register",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "email",
+							"value": "felosa@gmail.com",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "12345678",
+							"type": "text"
+						},
+						{
+							"key": "password_confirmation",
+							"value": "12345678",
+							"type": "text"
+						},
+						{
+							"key": "phone_number",
+							"value": "0934679783",
+							"type": "text"
+						},
+						{
+							"key": "name",
+							"value": "ahmad",
+							"type": "text"
+						},
+						{
+							"key": "address",
+							"value": "damascus",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/register",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "email",
+							"value": "felosadat@gmail.com",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "12345678",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/login",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Profile",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "1|LQ0a1zZiRQVWVlyzdRtB6KtOLHhpFI5PLkDjKMRZ270e77cf",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/profile",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"profile"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Logout",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "store_menu",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "2|GUi6JBkgtJk4bbEo6cVrpg3oz8gRdcuMoXBjllzubbf12910",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "name",
+							"value": "krespe",
+							"type": "text"
+						},
+						{
+							"key": "price",
+							"value": "20000",
+							"type": "text"
+						},
+						{
+							"key": "description",
+							"value": "asjaj ajj akj kajsk lajkj kjaljlksa iuw iauiw ih uiawu aupwoiu a",
+							"type": "text"
+						},
+						{
+							"key": "category",
+							"value": "chiken",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/store",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"store"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Index_menu",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "show_menu_with_id",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "update_menu",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "2|GUi6JBkgtJk4bbEo6cVrpg3oz8gRdcuMoXBjllzubbf12910",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "_method",
+							"value": "put",
+							"type": "text"
+						},
+						{
+							"key": "name",
+							"value": "crespy",
+							"type": "text"
+						},
+						{
+							"key": "price",
+							"value": "20000",
+							"type": "text"
+						},
+						{
+							"key": "description",
+							"value": "wqe wqeqw eqwe qw eqweqw e qwewq e qwe qwe qwe qwe qw eqweqw eqw eqw e",
+							"type": "text"
+						},
+						{
+							"key": "category",
+							"value": "chiken",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/update/1",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"update",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete_menu",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "2|GUi6JBkgtJk4bbEo6cVrpg3oz8gRdcuMoXBjllzubbf12910",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/delete/1",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"delete",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "upload_images",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "2|GUi6JBkgtJk4bbEo6cVrpg3oz8gRdcuMoXBjllzubbf12910",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "images[]",
+							"type": "file",
+							"src": [
+								"/C:/Users/ahmad/Desktop/WhatsApp Image 2024-11-16 at 11.20.15_06a08784.jpg",
+								"/C:/Users/ahmad/Desktop/WhatsApp Image 2024-11-16 at 11.20.15_9e8786f7.jpg",
+								"/C:/Users/ahmad/Desktop/WhatsApp Image 2024-11-16 at 11.20.15_27cb77e7.jpg",
+								"/C:/Users/ahmad/Desktop/Screenshot 2024-09-15 153336 - Copy.png"
+							]
+						}
+					]
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/upload_image/2",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"upload_image",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update_images",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "2|GUi6JBkgtJk4bbEo6cVrpg3oz8gRdcuMoXBjllzubbf12910",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "images[]",
+							"type": "file",
+							"src": [
+								"/C:/Users/ahmad/Desktop/WhatsApp Image 2024-11-16 at 11.20.15_9e8786f7.jpg",
+								"/C:/Users/ahmad/Desktop/Screenshot 2024-12-24 132450 - Copy.png"
+							]
+						},
+						{
+							"key": "_method",
+							"value": "put",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/update_image/2",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"update_image",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "change_password",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "2|GUi6JBkgtJk4bbEo6cVrpg3oz8gRdcuMoXBjllzubbf12910",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "_method",
+							"value": "put",
+							"type": "text"
+						},
+						{
+							"key": "old_password",
+							"value": "12345678",
+							"type": "text"
+						},
+						{
+							"key": "new_password",
+							"value": "123456789",
+							"type": "text"
+						},
+						{
+							"key": "new_password_confirmation",
+							"value": "123456789",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/changePassword",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"changePassword"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "change_phone_number",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "3|4MnFUlVeJGZ1KR5z83C6ahCHyYaoD0bqCAfqHjJl369fec2e",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "_method",
+							"value": "put",
+							"type": "text"
+						},
+						{
+							"key": "phone_number",
+							"value": "0988554499",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "123456789",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/changePhoneNumber",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"changePhoneNumber"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "store_order",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "3|4MnFUlVeJGZ1KR5z83C6ahCHyYaoD0bqCAfqHjJl369fec2e",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "   {\r\n\r\n\r\n  \r\n       \"order_items\": [\r\n           {\r\n               \"menu_id\": 2,\r\n               \"quantity\": 2\r\n           },\r\n           {\r\n               \"menu_id\": 2,\r\n               \"quantity\": 1\r\n           }\r\n       ]\r\n   }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/store_order",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"store_order"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "index_order",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "3|4MnFUlVeJGZ1KR5z83C6ahCHyYaoD0bqCAfqHjJl369fec2e",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/index_order",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"index_order"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "show_order_with_id",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "3|4MnFUlVeJGZ1KR5z83C6ahCHyYaoD0bqCAfqHjJl369fec2e",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/show_order/1",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"show_order",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update_status",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "3|4MnFUlVeJGZ1KR5z83C6ahCHyYaoD0bqCAfqHjJl369fec2e",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "status",
+							"value": "cancelled",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/update_order/1",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"update_order",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete_order_canceled",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}

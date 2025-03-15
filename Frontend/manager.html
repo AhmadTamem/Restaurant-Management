@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manager Dashboard</title>
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f8f8;
+            color: #333;
+        }
+        header {
+            background-color: #e74c3c; /* Red color for the restaurant theme */
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 28px;
+            border-bottom: 3px solid #c0392b;
+        }
+        .container {
+            margin: 30px auto;
+            max-width: 900px;
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            font-size: 24px;
+            color: #e74c3c;
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #e74c3c; /* Red color */
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+          
+            margin-top: 10px;
+        }
+        button.delete {
+            background-color: #f44336; /* A deeper red for delete button */
+        }
+        button:hover {
+            background-color: #c0392b;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            font-size: 16px;
+        }
+        th {
+            background-color: #f2f2f2;
+            color: #e74c3c;
+        }
+        td button {
+            width: auto;
+            margin-right: 5px;
+        }
+        td img {
+            max-width: 80px;
+            height: auto;
+            margin-right: 5px;
+            cursor: pointer;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .link {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #555;
+        }
+        .link a {
+            color: #e74c3c;
+            text-decoration: none;
+        }
+        .link a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            h2 {
+                font-size: 22px;
+            }
+            table th, table td {
+                font-size: 14px;
+                padding: 8px;
+            }
+        }
+ 
+            #logout-btn {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background-color: #cdc5c4;
+        color: rgb(195, 29, 29);
+        border: none;
+        padding: 10px 20px;
+        font-size: 14px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    #logout-btn:hover {
+        background-color: #f1f1f1;
+    }
+        
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Manager Dashboard</h1>
+        <button id="logout-btn" onclick="logout()">Logout</button>
+    </header>
+    <div class="container">
+        <h2>Menu Management</h2>
+        <button onclick="addMenuItem()">Add New Item</button>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Images</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="menu-table">
+                <!-- Menu items will be dynamically loaded here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('No token found. Please login first.');
+                window.location.href = 'login.html';
+            } else {
+                loadMenuItems(); // Load menu items when the page is loaded
+            }
+        });
+
+     // Function to load all menu items from the API
+async function loadMenuItems() {
+    const token = localStorage.getItem('token');
+    try {
+        const response = await fetch('http://127.0.0.1:8000/api/index', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+        const data = await response.json();
+        if (response.ok) {
+            const menuTable = document.getElementById('menu-table');
+            menuTable.innerHTML = ''; // Clear existing table rows
+
+            data.data.forEach(item => {
+                const row = document.createElement('tr');
+                row.setAttribute('data-id', item.id);
+
+                // Prepare image display
+                let imagesHtml = '';
+                if (item.image.length > 0) {
+                    // Loop through images and create <img> tags
+                    item.image.forEach(img => {
+                        imagesHtml += `<img src="${img.image}" alt="Menu Image" width="100" height="100" style="margin-right: 5px;">`;
+                    });
+                } else {
+                    imagesHtml = '<p>No images available</p>'; // If no images
+                }
+
+                // Build table row
+                row.innerHTML = `
+                    <td>${item.id}</td>
+                    <td>${item.name}</td>
+                    <td>${item.description}</td>
+                    <td>${item.category}</td>
+                    <td>${item.price}</td>
+                    <td>
+                        <div id="images-${item.id}">
+                            ${imagesHtml} <!-- Insert images here -->
+                        </div>
+                        <input type="file" id="file-input-${item.id}" accept="image/*" onchange="handleImageUpload(${item.id})">
+                        <button onclick="triggerFileInput(${item.id})">Add Image</button>
+                    </td>
+                    <td>
+                        <button onclick="updateMenuItem(${item.id}, '${item.name}', '${item.description}', '${item.category}', ${item.price})">Edit</button>
+                        <button class="delete" onclick="deleteMenuItem(${item.id})">Delete</button>
+                    </td>
+                `;
+                menuTable.appendChild(row);
+            });
+        } else {
+            alert('Failed to load menu items: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error loading menu items');
+    }
+}
+
+        async function addMenuItem() {
+            const name = prompt('Enter item name:');
+            const description = prompt('Enter item description:');
+            const category = prompt('Enter item category:');
+            const price = prompt('Enter item price:');
+            const token = localStorage.getItem('token');
+            if (name && description && category && price && token) {
+                try {
+                    const response = await fetch('http://127.0.0.1:8000/api/store', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`,
+                        },
+                        body: JSON.stringify({
+                            name: name,
+                            description: description,
+                            category: category,
+                            price: parseFloat(price),
+                        }),
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        alert(`New item added: ${data.data.name}`);
+                        loadMenuItems(); // Reload all items after adding a new one
+                    } else {
+                        alert('Failed to add item: ' + data.message);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error adding item');
+                }
+            } else {
+                alert('All fields are required.');
+            }
+        }
+
+        async function updateMenuItem(id, currentName, currentDescription, currentCategory, currentPrice) {
+            const newName = prompt('Enter new item name:', currentName);
+            const newDescription = prompt('Enter new item description:', currentDescription);
+            const newCategory = prompt('Enter new item category:', currentCategory);
+            const newPrice = prompt('Enter new item price:', currentPrice);
+            const token = localStorage.getItem('token');
+            if (newName && newDescription && newCategory && newPrice && token) {
+                try {
+                    const response = await fetch(`http://127.0.0.1:8000/api/update/${id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`,
+                        },
+                        body: JSON.stringify({
+                            name: newName,
+                            description: newDescription,
+                            category: newCategory,
+                            price: parseFloat(newPrice),
+                        }),
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        alert(`Item updated: ${data.data.name}`);
+                        loadMenuItems(); // Reload all items after updating
+                    } else {
+                        alert('Failed to update item: ' + data.message);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error updating item');
+                }
+            } else {
+                alert('All fields are required.');
+            }
+        }
+
+        async function deleteMenuItem(id) {
+            const token = localStorage.getItem('token');
+            if (token) {
+                try {
+                    const response = await fetch(`http://127.0.0.1:8000/api/delete/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                        },
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        alert(`Item deleted: ${data.message}`);
+                        loadMenuItems(); // Reload all items after deletion
+                    } else {
+                        alert('Failed to delete item: ' + data.message);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error deleting item');
+                }
+            } else {
+                alert('Token is required.');
+            }
+        }
+
+        function triggerFileInput(id) {
+    const fileInput = document.getElementById(`file-input-${id}`);
+    fileInput.click(); // تفعيل حقل الإدخال المخفي لاختيار الملف
+}
+
+async function handleImageUpload(id) {
+    const fileInput = document.getElementById(`file-input-${id}`);
+    const file = fileInput.files[0];
+    const token = localStorage.getItem('token');
+
+    if (file && token) {
+        const formData = new FormData();
+        formData.append('images[]', file); // تأكد من مطابقة اسم الحقل مع ما يتوقعه API
+
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/api/upload_image/${id}`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`, // إضافة التوكين في الهيدر
+                },
+                body: formData, // إرسال الصورة في الجسم
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                alert('Image uploaded successfully!');
+                // إذا كنت لا تحتاج إلى عرض الصورة في واجهة المستخدم، يمكنك حذف الكود التالي
+                console.log('Response from server:', data);
+            } else {
+                alert('Failed to upload image: ' + (data.message || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Error during image upload:', error);
+            alert('Error uploading image');
+        }
+    } else {
+        alert('Please select an image and make sure you are logged in.');
+    }
+
+}
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('No token found. Please login first.');
+            window.location.href = 'login.html';
+        } else {
+            loadMenuItems(); // Load menu items when the page is loaded
+        }
+    });
+
+    async function loadMenuItems() {
+        const token = localStorage.getItem('token');
+        try {
+            const response = await fetch('http://127.0.0.1:8000/api/index', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+            const data = await response.json();
+            if (response.ok) {
+                const menuTable = document.getElementById('menu-table');
+                menuTable.innerHTML = ''; // Clear existing table rows
+
+                data.data.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.setAttribute('data-id', item.id);
+
+                    // Prepare image display
+                    let imagesHtml = '';
+                    if (item.image.length > 0) {
+                        item.image.forEach(img => {
+                            imagesHtml += `<img src="${img.image}" alt="Menu Image" width="100" height="100" style="margin-right: 5px;">`;
+                        });
+                    } else {
+                        imagesHtml = '<p>No images available</p>';
+                    }
+
+                    row.innerHTML = `
+                        <td>${item.id}</td>
+                        <td>${item.name}</td>
+                        <td>${item.description}</td>
+                        <td>${item.category}</td>
+                        <td>${item.price}</td>
+                        <td>
+                            <div id="images-${item.id}">
+                                ${imagesHtml}
+                            </div>
+                            <input type="file" id="file-input-${item.id}" accept="image/*" onchange="handleImageUpload(${item.id})">
+                            <button onclick="triggerFileInput(${item.id})">Add Image</button>
+                        </td>
+                        <td>
+                            <button onclick="updateMenuItem(${item.id}, '${item.name}', '${item.description}', '${item.category}', ${item.price})">Edit</button>
+                            <button class="delete" onclick="deleteMenuItem(${item.id})">Delete</button>
+                        </td>
+                    `;
+                    menuTable.appendChild(row);
+                });
+            } else {
+                alert('Failed to load menu items: ' + data.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error loading menu items');
+        }
+    }
+
+    async function logout() {
+        const token = localStorage.getItem('token');
+        try {
+            const response = await fetch('http://127.0.0.1:8000/api/logout', {
+                method: 'GET', 
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                alert('Logout successful.');
+                localStorage.removeItem('token');
+                window.location.href = 'login.html';
+            } else {
+                const data = await response.json();
+                alert('Logout failed: ' + (data.message || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Logout error:', error);
+            alert('Error during logout. Please try again.');
+        }
+    }
+    </script>
+</body>
+</html>
